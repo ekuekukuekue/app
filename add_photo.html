@@ -16,7 +16,7 @@
 
   <p id="status"></p>
 
-  <button onclick="location.href='zukan_list.html'">図鑑一覧に戻る</button>
+  <button onclick="location.href='/myzukan/zukan_list.html'">図鑑一覧に戻る</button>
 
   <script>
     document.getElementById('photoForm').addEventListener('submit', (e) => {
@@ -28,24 +28,22 @@
         return;
       }
 
-      // 画像のリサイズと圧縮
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800; // 最大幅
+          const MAX_WIDTH = 800;
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           
-          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEGで圧縮率70%
+          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
-          // リサイズした画像をセッションストレージに保存
           sessionStorage.setItem('currentPhoto', resizedDataUrl);
-          location.href = 'photo_info.html';
+          location.href = '/myzukan/photo_info.html';
         };
         img.src = event.target.result;
       };
