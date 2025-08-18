@@ -19,35 +19,45 @@
   <button onclick="location.href='/myzukan/zukan_list.html'">図鑑一覧に戻る</button>
 
   <script>
-    document.getElementById('photoForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const imageFile = document.getElementById('photoImage').files[0];
-
-      if (!imageFile) {
-        alert("画像を選んでください");
+    document.addEventListener('DOMContentLoaded', () => {
+      const zukanId = localStorage.getItem('currentZukanId');
+      // ここが修正点
+      if (!zukanId) {
+        alert("写真を追加する図鑑が選択されていません。図鑑一覧に戻ります。");
+        location.href = '/myzukan/zukan_list.html';
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('photoForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const imageFile = document.getElementById('photoImage').files[0];
 
-          sessionStorage.setItem('currentPhoto', resizedDataUrl);
-          location.href = '/myzukan/photo_info.html';
+        if (!imageFile) {
+          alert("画像を選んでください");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800;
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+            sessionStorage.setItem('currentPhoto', resizedDataUrl);
+            location.href = '/myzukan/photo_info.html';
+          };
+          img.src = event.target.result;
         };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(imageFile);
+        reader.readAsDataURL(imageFile);
+      });
     });
   </script>
 </body>
