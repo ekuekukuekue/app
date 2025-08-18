@@ -39,11 +39,11 @@
           div.textContent = zukan.name;
 
           const btnAdd = document.createElement('button');
-          btnAdd.textContent = '写真を追加';
-          btnAdd.onclick = () => {
-            localStorage.setItem('currentZukanId', zukan.id);
-            location.href = '/myzukan/add_photo.html';
-          };
+            btnAdd.textContent = '写真を追加';
+            btnAdd.onclick = () => {
+              localStorage.setItem('currentZukanId', zukan.id);
+              location.href = '/myzukan/add_photo.html';
+            };
 
           const btnView = document.createElement('button');
           btnView.textContent = '閲覧';
@@ -57,7 +57,7 @@
           btnDelete.onclick = () => {
             if (confirm(`「${zukan.name}」を削除しますか？`)) {
               deleteZukan(zukan.id);
-              renderList(); // 再描画
+              renderList();
             }
           };
 
@@ -97,10 +97,6 @@
 
       renderList();
       renderMapMarkers();
-    });
-  </script>
-</body>
-</html>
     });
   </script>
 </body>
