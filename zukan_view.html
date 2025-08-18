@@ -5,11 +5,9 @@
   <title>図鑑を見る</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- exif.js（script.js より前に読み込む！） -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
   <script src="script.js" defer></script>
@@ -37,10 +35,10 @@
           const card = document.createElement('div');
           card.className = 'photo-card';
           card.innerHTML = `
-            <img src="${photo.image}" alt="${photo.name}" id="photo-${index}"><br>
-            <strong>${photo.name}</strong><br>
-            <p>${photo.description}</p>
-            <div id="map-${index}" style="height:200px; width:100%; margin-top:10px;"></div>
+            <h3>${photo.name}</h3>
+            <p>${photo.description || ''}</p>
+            <img src="${photo.image}" alt="${photo.name}" width="200" id="photo-${index}">
+            <div id="map-${index}" style="height:200px; margin-top:10px;"></div>
           `;
           photoList.appendChild(card);
 
@@ -53,12 +51,13 @@
             const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
 
             if (lat && lng) {
-              const latDec = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
-              const lngDec = convertDMSToDD(lng[0], lng[1], lng[2], lngRef);
+              // 緯度経度の変換
+              const latDec = lat[0] + lat[1] / 60 + lat[2] / 3600;
+              const lngDec = lng[0] + lng[1] / 60 + lng[2] / 3600;
 
               const map = L.map(`map-${index}`).setView([latDec, lngDec], 13);
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+                attribution: '&copy; OpenStreetMap contributors'
               }).addTo(map);
 
               L.marker([latDec, lngDec]).addTo(map)
@@ -72,15 +71,6 @@
         });
       }
     });
-
-    // 度分秒 → 10進数
-    function convertDMSToDD(degrees, minutes, seconds, direction) {
-      let dd = degrees + minutes/60 + seconds/(60*60);
-      if (direction === "S" || direction === "W") {
-        dd = dd * -1;
-      }
-      return dd;
-    }
   </script>
 </body>
 </html>
