@@ -1,10 +1,11 @@
-<!-- ✅ zukan_list.html を修正（getZukans が未定義エラーの修正） -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <title>図鑑一覧</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -13,13 +14,18 @@
   </header>
   <div id="listContainer"></div>
   <button id="btnBack">スタート画面に戻る</button>
+
+  <hr>
+
+  <h2>マップ</h2>
+  <div id="map" style="height:400px;"></div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const listContainer = document.getElementById('listContainer');
       const btnBack = document.getElementById('btnBack');
 
       function renderList() {
-        // ✅ script.js の getZukans() 関数を使う
         const zukans = getZukans();
         if (zukans.length === 0) {
           listContainer.innerHTML = '<p>まだ図鑑がありません。</p>';
@@ -52,12 +58,12 @@
             if (confirm(`「${zukan.name}」を削除しますか？`)) {
               deleteZukan(zukan.id);
               renderList(); // 再描画
-              }
-            };
+            }
+          };
 
           div.appendChild(btnAdd);
           div.appendChild(btnView);
-          div.appendChild(btnDelete); 
+          div.appendChild(btnDelete);  
           listContainer.appendChild(div);
         });
       }
@@ -66,7 +72,32 @@
         location.href = 'index.html';
       };
 
+      // マップ初期化とピンの表示
+      const map = L.map('map').setView([35, 135], 5); // 日本の中心あたり
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      function renderMapMarkers() {
+        const zukans = getZukans();
+        zukans.forEach(zukan => {
+          if (zukan.photos) {
+            zukan.photos.forEach(photo => {
+              if (photo.lat && photo.lng) {
+                const marker = L.marker([photo.lat, photo.lng]).addTo(map);
+                marker.bindPopup(`
+                  <b>${photo.name}</b><br>
+                  <img src="${photo.image}" width="100"><br>
+                  ${photo.description || ''}
+                `);
+              }
+            });
+          }
+        });
+      }
+
       renderList();
+      renderMapMarkers();
     });
   </script>
 </body>
