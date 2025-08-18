@@ -36,3 +36,13 @@ function getZukanById(id) {
   const zukans = getZukans();
   return zukans.find(zukan => zukan.id === id);
 }
+
+// 特定の図鑑から写真をIDで削除する関数
+function deletePhotoFromZukan(zukanId, photoId) {
+  const zukans = getZukans();
+  const zukan = zukans.find(z => z.id === zukanId);
+  if (zukan) {
+    zukan.photos = zukan.photos.filter(photo => photo.id !== photoId);
+    saveZukans(zukans);
+  }
+}
