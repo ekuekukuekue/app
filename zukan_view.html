@@ -18,12 +18,14 @@
     document.addEventListener('DOMContentLoaded', () => {
       const zukanId = localStorage.getItem('currentZukanId');
       const zukan = getZukanById(zukanId);
-      const photoList = document.getElementById('photoList');
 
+      // ここが修正点
       if (!zukan) {
-        photoList.innerHTML = '<p>図鑑が見つかりません。</p>';
+        document.getElementById('photoList').innerHTML = '<p>図鑑が見つかりません。図鑑一覧から選択してください。</p>';
         return;
       }
+
+      const photoList = document.getElementById('photoList');
 
       if (!zukan.photos || zukan.photos.length === 0) {
         photoList.innerHTML = '<p>写真がまだ登録されていません。</p>';
