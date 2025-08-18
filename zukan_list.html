@@ -42,14 +42,14 @@
           btnAdd.textContent = '写真を追加';
           btnAdd.onclick = () => {
             localStorage.setItem('currentZukanId', zukan.id);
-            location.href = 'add_photo.html';
+            location.href = '/myzukan/add_photo.html';
           };
 
           const btnView = document.createElement('button');
           btnView.textContent = '閲覧';
           btnView.onclick = () => {
             localStorage.setItem('currentZukanId', zukan.id);
-            location.href = 'zukan_view.html';
+            location.href = '/myzukan/zukan_view.html';
           };
 
           const btnDelete = document.createElement('button');
@@ -69,11 +69,10 @@
       }
 
       btnBack.onclick = () => {
-        location.href = 'index.html';
+        location.href = '/myzukan/index.html';
       };
 
-      // マップ初期化とピンの表示
-      const map = L.map('map').setView([35, 135], 5); // 日本の中心あたり
+      const map = L.map('map').setView([35, 135], 5);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
@@ -98,6 +97,10 @@
 
       renderList();
       renderMapMarkers();
+    });
+  </script>
+</body>
+</html>
     });
   </script>
 </body>
