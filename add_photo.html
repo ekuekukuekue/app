@@ -10,10 +10,8 @@
   <header><h1>写真を追加</h1></header>
 
   <form id="photoForm">
-    <label>名前: <input type="text" id="photoName" required></label><br>
-    <label>説明: <textarea id="photoDesc"></textarea></label><br>
-    <label>画像: <input type="file" id="photoImage" accept="image/*" required></label><br>
-    <button type="submit">登録</button>
+    <label>画像を選択: <input type="file" id="photoImage" accept="image/*" required></label>
+    <button type="submit">次へ</button>
   </form>
 
   <p id="status"></p>
@@ -23,9 +21,6 @@
   <script>
     document.getElementById('photoForm').addEventListener('submit', (e) => {
       e.preventDefault();
-
-      const name = document.getElementById('photoName').value;
-      const description = document.getElementById('photoDesc').value;
       const imageFile = document.getElementById('photoImage').files[0];
 
       if (!imageFile) {
@@ -33,53 +28,29 @@
         return;
       }
 
+      // 画像のリサイズと圧縮
       const reader = new FileReader();
-      reader.onload = () => {
-        // GPS取得
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800; // 最大幅
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7); // JPEGで圧縮率70%
 
-            const photo = {
-              name,
-              description,
-              image: reader.result,
-              lat,
-              lng
-            };
-
-            savePhoto(photo);
-          }, (err) => {
-            alert("位置情報を取得できませんでした");
-            const photo = {
-              name,
-              description,
-              image: reader.result,
-              lat: null,
-              lng: null
-            };
-            savePhoto(photo);
-          });
-        } else {
-          alert("この端末では位置情報が使えません");
-        }
+          // リサイズした画像をセッションストレージに保存
+          sessionStorage.setItem('currentPhoto', resizedDataUrl);
+          location.href = 'photo_info.html';
+        };
+        img.src = event.target.result;
       };
       reader.readAsDataURL(imageFile);
     });
-
-    function savePhoto(photo) {
-      const zukanId = localStorage.getItem('currentZukanId');
-      const zukan = getZukanById(zukanId);
-
-      if (!zukan.photos) {
-        zukan.photos = [];
-      }
-      zukan.photos.push(photo);
-
-      updateZukan(zukanId, zukan);
-      document.getElementById('status').textContent = "登録しました！";
-    }
   </script>
 </body>
 </html>
