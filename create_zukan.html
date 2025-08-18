@@ -22,6 +22,7 @@
         alert('図鑑の名前を入力してください');
         return;
       }
+      // script.jsのaddZukan関数がidを返すように修正したので、そのidをセット
       const newId = addZukan(name);
       localStorage.setItem('currentZukanId', newId);
       location.href = 'add_photo.html';
