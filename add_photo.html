@@ -1,55 +1,84 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>写真を追加</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
   <header><h1>写真を追加</h1></header>
 
-  <input type="file" id="imageInput" accept="image/*">
-  <img id="previewImage" src="" alt="プレビュー" style="max-width: 100%; display: none;">
-  
-  <button id="btnNext">次へ</button>
-  <button id="btnBack">戻る</button>
+  <form id="photoForm">
+    <label>名前: <input type="text" id="photoName" required></label><br>
+    <label>説明: <textarea id="photoDesc"></textarea></label><br>
+    <label>画像: <input type="file" id="photoImage" accept="image/*" required></label><br>
+    <button type="submit">登録</button>
+  </form>
+
+  <p id="status"></p>
 
   <script>
-    const imageInput = document.getElementById('imageInput');
-    const preview = document.getElementById('previewImage');
-    const btnNext = document.getElementById('btnNext');
-    const btnBack = document.getElementById('btnBack');
-    let imageData = null;
+    document.getElementById('photoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
 
-    // 画像を選択したらプレビュー表示
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imageData = e.target.result;
-        preview.src = imageData;
-        preview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    });
+      const name = document.getElementById('photoName').value;
+      const description = document.getElementById('photoDesc').value;
+      const imageFile = document.getElementById('photoImage').files[0];
 
-    // 次へボタン
-    btnNext.onclick = () => {
-      if (!imageData) {
-        alert('画像を選択してください');
+      if (!imageFile) {
+        alert("画像を選んでください");
         return;
       }
-      // sessionStorage に画像を保存
-      sessionStorage.setItem('currentPhoto', imageData);
-      // ✅ スマホ対応：GitHub Pages では絶対パスに変更
-      location.href = '/myzukan/photo_info.html';
-    };
 
-    // 戻るボタン
-    btnBack.onclick = () => {
-      location.href = '/myzukan/create_zukan.html';
-    };
+      const reader = new FileReader();
+      reader.onload = () => {
+        // GPS取得
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            const photo = {
+              name,
+              description,
+              image: reader.result,
+              lat,
+              lng
+            };
+
+            savePhoto(photo);
+          }, (err) => {
+            alert("位置情報を取得できませんでした");
+            const photo = {
+              name,
+              description,
+              image: reader.result,
+              lat: null,
+              lng: null
+            };
+            savePhoto(photo);
+          });
+        } else {
+          alert("この端末では位置情報が使えません");
+        }
+      };
+      reader.readAsDataURL(imageFile);
+    });
+
+    function savePhoto(photo) {
+      const zukanId = localStorage.getItem('currentZukanId');
+      const zukan = getZukanById(zukanId);
+
+      if (!zukan.photos) {
+        zukan.photos = [];
+      }
+      zukan.photos.push(photo);
+
+      updateZukan(zukanId, zukan);
+      document.getElementById('status').textContent = "登録しました！";
+    }
   </script>
 </body>
 </html>
+
