@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- exif.js -->
+  <!-- exif.js（script.js より前に読み込む！） -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 
   <script src="script.js" defer></script>
@@ -22,7 +22,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const zukanId = localStorage.getItem('currentZukanId');
-      const zukan = getZukanById(zukanId);
+      const zukan = getZukanById(zukanId); // script.js 内にある想定
       const photoList = document.getElementById('photoList');
 
       if (!zukan) {
@@ -44,7 +44,7 @@
           `;
           photoList.appendChild(card);
 
-          // EXIFからGPSを取得して地図に表示
+          // EXIF から GPS を取得
           const img = document.getElementById(`photo-${index}`);
           EXIF.getData(img, function() {
             const lat = EXIF.getTag(this, "GPSLatitude");
@@ -56,7 +56,6 @@
               const latDec = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
               const lngDec = convertDMSToDD(lng[0], lng[1], lng[2], lngRef);
 
-              // Leafletで地図を表示
               const map = L.map(`map-${index}`).setView([latDec, lngDec], 13);
               L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
@@ -74,7 +73,7 @@
       }
     });
 
-    // 度分秒を10進数に変換
+    // 度分秒 → 10進数
     function convertDMSToDD(degrees, minutes, seconds, direction) {
       let dd = degrees + minutes/60 + seconds/(60*60);
       if (direction === "S" || direction === "W") {
