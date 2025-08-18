@@ -33,7 +33,7 @@
     } else {
       console.warn('currentPhoto が見つかりません');
       alert('画像情報がありません。再度写真を選択してください。');
-      location.href = '/app/add_photo.html';
+      location.href = 'add_photo.html';
     }
 
     btnSave.onclick = () => {
@@ -55,28 +55,29 @@
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const photo = { image: photoData, name: name, description: desc, lat: lat, lng: lng };
+          // 修正点：写真に一意のIDを付与
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
-          location.href = '/app/complete.html';
+          location.href = 'complete.html';
         }, (err) => {
           alert("位置情報を取得できませんでした");
-          const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
-          location.href = '/app/complete.html';
+          location.href = 'complete.html';
         });
       } else {
         alert("この端末では位置情報が使えません");
-        const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
+        const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
         addPhotoToZukan(zukanId, photo);
         sessionStorage.removeItem('currentPhoto');
-        location.href = '/app/complete.html';
+        location.href = 'complete.html';
       }
     };
 
     btnBack.onclick = () => {
-      location.href = '/app/add_photo.html';
+      location.href = 'add_photo.html';
     };
 
     function addPhotoToZukan(zukanId, photo) {
