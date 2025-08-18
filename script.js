@@ -32,11 +32,17 @@ function getZukanById(id) {
   return zukans.find(zukan => zukan.id === id);
 }
 
-function updateZukan(id, updatedZukan) {
-  let zukans = getZukans();
+function addPhotoToZukan(id, photoData) {
+  const zukans = getZukans();
   const index = zukans.findIndex(z => z.id === id);
-  if (index !== -1) {
-    zukans[index] = updatedZukan;
-    saveZukans(zukans);
+  if (index === -1) return;
+
+  if (!zukans[index].photos) {
+    zukans[index].photos = [];
   }
+  
+  zukans[index].photos.push(photoData);
+  saveZukans(zukans);
 }
+
+// updateZukan 関数は不要になったため削除しました。
