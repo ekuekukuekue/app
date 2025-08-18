@@ -33,7 +33,7 @@
     } else {
       console.warn('currentPhoto が見つかりません');
       alert('画像情報がありません。再度写真を選択してください。');
-      location.href = '/myzukan/add_photo.html';
+      location.href = '/app/add_photo.html';
     }
 
     btnSave.onclick = () => {
@@ -58,25 +58,25 @@
           const photo = { image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
-          location.href = '/myzukan/complete.html';
+          location.href = '/app/complete.html';
         }, (err) => {
           alert("位置情報を取得できませんでした");
           const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
-          location.href = '/myzukan/complete.html';
+          location.href = '/app/complete.html';
         });
       } else {
         alert("この端末では位置情報が使えません");
         const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
         addPhotoToZukan(zukanId, photo);
         sessionStorage.removeItem('currentPhoto');
-        location.href = '/myzukan/complete.html';
+        location.href = '/app/complete.html';
       }
     };
 
     btnBack.onclick = () => {
-      location.href = '/myzukan/add_photo.html';
+      location.href = '/app/add_photo.html';
     };
 
     function addPhotoToZukan(zukanId, photo) {
