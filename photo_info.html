@@ -17,14 +17,14 @@
   <label for="photoDescription">説明：</label>
   <textarea id="photoDescription"></textarea>
 
-  <button id="btnNext">次へ</button>
+  <button id="btnSave">登録</button>
   <button id="btnBack">戻る</button>
 
   <script>
     const image = document.getElementById('displayImage');
     const nameInput = document.getElementById('photoName');
     const descInput = document.getElementById('photoDescription');
-    const btnNext = document.getElementById('btnNext');
+    const btnSave = document.getElementById('btnSave');
     const btnBack = document.getElementById('btnBack');
 
     // セッションストレージから画像取得
@@ -33,14 +33,16 @@
       image.src = photoData;
     } else {
       console.warn('currentPhoto が見つかりません');
+      alert('画像情報がありません。再度写真を選択してください。');
+      location.href = 'add_photo.html';
     }
 
-    btnNext.onclick = () => {
+    btnSave.onclick = () => {
       const name = nameInput.value.trim();
       const desc = descInput.value.trim();
 
-      if (!photoData || !name || !desc) { // ★画像も必須チェック
-        alert('画像、名前、説明を入力してください');
+      if (!photoData || !name || !desc) {
+        alert('名前と説明を入力してください');
         return;
       }
 
@@ -49,20 +51,50 @@
         alert('図鑑が選択されていません');
         return;
       }
-
-      const photo = { image: photoData, name: name, description: desc };
-      addPhotoToZukan(zukanId, photo);
-
-      // セッションストレージはここで削除
-      sessionStorage.removeItem('currentPhoto');
-
-      // ✅ スマホ対応：GitHub Pages では絶対パスに変更
-      location.href = '/myzukan/complete.html';
+      
+      // GPS情報を取得
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const photo = { image: photoData, name: name, description: desc, lat: lat, lng: lng };
+          addPhotoToZukan(zukanId, photo);
+          sessionStorage.removeItem('currentPhoto');
+          location.href = 'complete.html';
+        }, (err) => {
+          alert("位置情報を取得できませんでした");
+          const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
+          addPhotoToZukan(zukanId, photo);
+          sessionStorage.removeItem('currentPhoto');
+          location.href = 'complete.html';
+        });
+      } else {
+        alert("この端末では位置情報が使えません");
+        const photo = { image: photoData, name: name, description: desc, lat: null, lng: null };
+        addPhotoToZukan(zukanId, photo);
+        sessionStorage.removeItem('currentPhoto');
+        location.href = 'complete.html';
+      }
     };
 
     btnBack.onclick = () => {
-      location.href = '/myzukan/add_photo.html';
+      location.href = 'add_photo.html';
     };
+
+    // addPhotoToZukan 関数を呼び出すための修正
+    function addPhotoToZukan(zukanId, photo) {
+      const zukans = getZukans();
+      const zukanIndex = zukans.findIndex(zukan => zukan.id === zukanId);
+      if (zukanIndex !== -1) {
+        if (!zukans[zukanIndex].photos) {
+          zukans[zukanIndex].photos = [];
+        }
+        zukans[zukanIndex].photos.push(photo);
+        saveZukans(zukans);
+      } else {
+        console.error('指定された図鑑が見つかりません');
+      }
+    }
   </script>
 </body>
 </html>
