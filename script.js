@@ -9,18 +9,16 @@ function saveZukans(zukans) {
   localStorage.setItem('zukans', JSON.stringify(zukans));
 }
 
-function addZukan(zukan) {
+function addZukan(name) {
   const zukans = getZukans();
-  zukans.push(zukan);
+  const newZukan = {
+    id: Date.now().toString(),
+    name: name,
+    photos: []
+  };
+  zukans.push(newZukan);
   saveZukans(zukans);
-}
-
-function getZukans() {
-  return JSON.parse(sessionStorage.getItem("zukans") || "[]");
-}
-
-function saveZukans(zukans) {
-  sessionStorage.setItem("zukans", JSON.stringify(zukans));
+  return newZukan.id;
 }
 
 function deleteZukan(id) {
@@ -29,18 +27,16 @@ function deleteZukan(id) {
   saveZukans(zukans);
 }
 
-
 function getZukanById(id) {
   const zukans = getZukans();
   return zukans.find(zukan => zukan.id === id);
 }
 
-function addPhotoToZukan(id, photoData) {
-  const zukans = getZukans();
+function updateZukan(id, updatedZukan) {
+  let zukans = getZukans();
   const index = zukans.findIndex(z => z.id === id);
-  if (index === -1) return;
-
-  zukans[index].photos.push(photoData);
-  saveZukans(zukans);
+  if (index !== -1) {
+    zukans[index] = updatedZukan;
+    saveZukans(zukans);
+  }
 }
-
