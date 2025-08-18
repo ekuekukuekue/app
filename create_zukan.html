@@ -16,6 +16,7 @@
     const btnNext = document.getElementById('btnNext');
     const btnBack = document.getElementById('btnBack');
     const input = document.getElementById('zukanName');
+    
     btnNext.onclick = () => {
       const name = input.value.trim();
       if (!name) {
@@ -26,10 +27,10 @@
       localStorage.setItem('currentZukanId', newId);
       location.href = '/myzukan/add_photo.html';
     };
+
     btnBack.onclick = () => {
       location.href = '/myzukan/index.html';
     };
   </script>
 </body>
-</html>
 </html>
