@@ -15,7 +15,7 @@
 
   <img id="displayImage" src="" alt="プレビュー" style="max-width: 100%;" />
 
-  <button id="btnAI" style="margin-top: 10px;">AIで自動入力</button>
+  <button id="btnAI" disabled>AIモデルを読み込み中...</button>
   <div id="aiSuggestions"></div>
 
   <label for="photoName">名前：</label>
@@ -53,6 +53,7 @@
         console.log("AIモデルの読み込みが完了しました。");
         btnAI.disabled = false;
         btnAI.textContent = "AIで自動入力";
+        btnAI.style.backgroundColor = 'lightgreen';
     }
 
     // 画像から予測
@@ -79,6 +80,7 @@
     btnAI.onclick = async () => {
         btnAI.textContent = "AIで解析中...";
         btnAI.disabled = true;
+        aiSuggestions.innerHTML = '';
         const predictions = await predictImage();
         displaySuggestions(predictions);
         btnAI.textContent = "AIで自動入力";
@@ -86,8 +88,6 @@
     };
 
     // 初期ロード時にAIモデルを読み込む
-    btnAI.disabled = true;
-    btnAI.textContent = "AIモデルを読み込み中...";
     loadModel();
 
     btnSave.onclick = () => {
