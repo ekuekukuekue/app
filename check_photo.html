@@ -53,6 +53,16 @@
         alert('名前と説明を入力してください');
         return;
       }
+      
+      // 同じ名前の重複をチェック
+      const allZukans = getZukans();
+      const isNameTaken = allZukans.some(zukan => 
+          zukan.photos && zukan.photos.some(photo => photo.name === name)
+      );
+      if (isNameTaken) {
+          alert('その名前はすでに使用されています。別の名前を入力してください。');
+          return;
+      }
 
       const zukanId = localStorage.getItem('currentZukanId');
       if (!zukanId) {
@@ -98,34 +108,14 @@
       location.href = 'add_photo.html';
     };
 
-    function getZukans() {
-      const json = localStorage.getItem('zukans');
-      return json ? JSON.parse(json) : [];
-    }
-
-    function saveZukans(zukans) {
-      localStorage.setItem('zukans', JSON.stringify(zukans));
-    }
-
-    function addPhotoToZukan(zukanId, photo) {
-      const zukans = getZukans();
-      const zukanIndex = zukans.findIndex(zukan => zukan.id === zukanId);
-      if (zukanIndex !== -1) {
-        if (!zukans[zukanIndex].photos) {
-          zukans[zukanIndex].photos = [];
-        }
-        zukans[zukanIndex].photos.push(photo);
-        saveZukans(zukans);
-      } else {
-        console.error('指定された図鑑が見つかりません');
-      }
-    }
-
     async function checkForDuplicates() {
         const currentImage = document.getElementById('displayImage');
         if (!currentImage.src) return;
 
         try {
+            duplicateCheckResult.textContent = '重複をチェック中...';
+            duplicateCheckResult.style.color = 'gray';
+
             // 新しい画像のハッシュを計算
             const newImageHash = await pHash.hash(currentImage);
             const newHashBinary = newImageHash.toBinary();
@@ -167,6 +157,7 @@
             duplicateCheckResult.style.color = 'red';
         }
     }
+
   </script>
 </body>
 </html>
