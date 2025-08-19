@@ -24,9 +24,10 @@
     const image = document.getElementById('displayImage');
     const nameInput = document.getElementById('photoName');
     const descInput = document.getElementById('photoDescription');
-    const btnSave = document.getElementById('btnSave');
-    const btnBack = document.getElementById('btnBack');
+    const btnSave = document = document.getElementById('btnSave');
+    const btnBack = document = document.getElementById('btnBack');
 
+    // セッションストレージから画像取得
     const photoData = sessionStorage.getItem('currentPhoto');
     if (photoData) {
       image.src = photoData;
@@ -44,18 +45,18 @@
         alert('名前と説明を入力してください');
         return;
       }
-
+      
       const zukanId = localStorage.getItem('currentZukanId');
       if (!zukanId) {
         alert('図鑑が選択されていません');
         return;
       }
-      
+
+      // 位置情報を取得し、写真オブジェクトを作成
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          // 修正点：写真に一意のIDを付与
           const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
@@ -75,7 +76,7 @@
         location.href = 'complete.html';
       }
     };
-
+    
     btnBack.onclick = () => {
       location.href = 'add_photo.html';
     };
@@ -93,6 +94,8 @@
         console.error('指定された図鑑が見つかりません');
       }
     }
+    
+    // getZukans と saveZukans は script.js にあることを想定
   </script>
 </body>
 </html>
