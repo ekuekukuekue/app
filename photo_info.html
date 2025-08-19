@@ -4,18 +4,12 @@
   <meta charset="UTF-8" />
   <title>写真の情報を入力</title>
   <link rel="stylesheet" href="style.css" />
-  
-  <script src="https://cdn.jsdelivr.net/npm/phash-js@0.3.0/dist/phash.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-hamming-distance@1.0.0/dist/js-hamming-distance.min.js"></script>
-
   <script src="script.js" defer></script>
 </head>
 <body>
   <header><h1>写真の情報を入力</h1></header>
 
   <img id="displayImage" src="" alt="プレビュー" style="max-width: 100%;" />
-
-  <div id="duplicateCheckResult"></div>
 
   <label for="photoName">名前：</label>
   <input type="text" id="photoName" />
@@ -32,7 +26,6 @@
     const descInput = document.getElementById('photoDescription');
     const btnSave = document.getElementById('btnSave');
     const btnBack = document.getElementById('btnBack');
-    const duplicateCheckResult = document.getElementById('duplicateCheckResult');
 
     const photoData = sessionStorage.getItem('currentPhoto');
     if (photoData) {
@@ -62,6 +55,7 @@
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          // 修正点：写真に一意のIDを付与
           const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
@@ -99,62 +93,6 @@
         console.error('指定された図鑑が見つかりません');
       }
     }
-
-    async function checkForDuplicates() {
-        const currentImage = document.getElementById('displayImage');
-        if (!currentImage.src) return;
-
-        try {
-            // 現在の画像のハッシュを計算
-            const newImageHash = await pHash.hash(currentImage);
-
-            // 全ての図鑑から過去の写真をチェック
-            const allZukans = getZukans();
-            let duplicateFound = false;
-
-            for (const zukan of allZukans) {
-                if (zukan.photos) {
-                    for (const photo of zukan.photos) {
-                        // 過去の各写真のハッシュを計算（存在すればスキップ）
-                        if (!photo.hash) {
-                           // ハッシュが未保存の場合は計算
-                           const img = new Image();
-                           img.src = photo.image;
-                           await new Promise(resolve => img.onload = resolve);
-                           photo.hash = await pHash.hash(img);
-                        }
-
-                        // ハッシュを比較し、類似度を計算（ハミング距離）
-                        const distance = HammingDistance(newImageHash.toBinary(), photo.hash.toBinary());
-                        // 距離が小さいほど類似している。ここでは10を閾値とする。
-                        if (distance <= 10) {
-                            // 重複と見なす
-                            const userConfirmation = confirm(`この写真は、すでに登録済みの「${photo.name}」に似ているようです。\n\n「${photo.name}」の情報を自動入力しますか？`);
-                            if (userConfirmation) {
-                                nameInput.value = photo.name;
-                                descInput.value = photo.description;
-                            }
-                            duplicateFound = true;
-                            // 重複が見つかった時点でループを終了
-                            break; 
-                        }
-                    }
-                }
-                if(duplicateFound) break;
-            }
-            if (!duplicateFound) {
-              duplicateCheckResult.textContent = '過去に登録した写真との重複は見つかりませんでした。';
-              duplicateCheckResult.style.color = 'green';
-            }
-        } catch (error) {
-            console.error('重複チェック中にエラーが発生しました:', error);
-            duplicateCheckResult.textContent = '重複チェックに失敗しました。';
-            duplicateCheckResult.style.color = 'red';
-        }
-    }
-
-    // ページの読み込み後に重複チェックを実行
-    checkForDuplicates();
   </script>
 </body>
 </html>
