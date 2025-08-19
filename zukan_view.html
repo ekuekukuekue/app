@@ -7,6 +7,9 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -17,7 +20,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const zukanId = localStorage.getItem('currentZukanId');
-      const zukan = getZukanById(zukanId);
+      const zukan = getZukanById(zukanId); // script.js 内にある想定
       const photoList = document.getElementById('photoList');
 
       if (!zukan) {
@@ -34,36 +37,40 @@
           card.innerHTML = `
             <h3>${photo.name}</h3>
             <p>${photo.description || ''}</p>
-            <img src="${photo.image}" alt="${photo.name}" width="200">
+            <img src="${photo.image}" alt="${photo.name}" width="200" id="photo-${index}">
             <div id="map-${index}" style="height:200px; margin-top:10px;"></div>
-            <button onclick="deletePhoto('${zukanId}', '${photo.id}')">この写真を削除</button>
           `;
           photoList.appendChild(card);
 
-          if (photo.lat && photo.lng) {
-            const map = L.map(`map-${index}`).setView([photo.lat, photo.lng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+          // EXIF から GPS を取得
+          const img = document.getElementById(`photo-${index}`);
+          EXIF.getData(img, function() {
+            const lat = EXIF.getTag(this, "GPSLatitude");
+            const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+            const lng = EXIF.getTag(this, "GPSLongitude");
+            const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
 
-            L.marker([photo.lat, photo.lng]).addTo(map)
-              .bindPopup(photo.name || "撮影場所")
-              .openPopup();
-          } else {
-            document.getElementById(`map-${index}`).innerHTML =
-              "<p style='color:gray;'>位置情報なし</p>";
-          }
+            if (lat && lng) {
+              // 緯度経度の変換
+              const latDec = lat[0] + lat[1] / 60 + lat[2] / 3600;
+              const lngDec = lng[0] + lng[1] / 60 + lng[2] / 3600;
+
+              const map = L.map(`map-${index}`).setView([latDec, lngDec], 13);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+              }).addTo(map);
+
+              L.marker([latDec, lngDec]).addTo(map)
+                .bindPopup(photo.name || "撮影場所")
+                .openPopup();
+            } else {
+              document.getElementById(`map-${index}`).innerHTML =
+                "<p style='color:gray;'>位置情報なし</p>";
+            }
+          });
         });
       }
     });
-
-    // 写真の削除関数を新しく追加
-    function deletePhoto(zukanId, photoId) {
-      if (confirm("この写真を削除しますか？")) {
-        deletePhotoFromZukan(zukanId, photoId);
-        location.reload(); // ページを再読み込みして更新
-      }
-    }
   </script>
 </body>
 </html>
