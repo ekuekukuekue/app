@@ -4,19 +4,12 @@
   <meta charset="UTF-8" />
   <title>写真の情報を入力</title>
   <link rel="stylesheet" href="style.css" />
-  
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"></script>
-  
   <script src="script.js" defer></script>
 </head>
 <body>
   <header><h1>写真の情報を入力</h1></header>
 
   <img id="displayImage" src="" alt="プレビュー" style="max-width: 100%;" />
-
-  <button id="btnAI" disabled>AIモデルを読み込み中...</button>
-  <div id="aiSuggestions"></div>
 
   <label for="photoName">名前：</label>
   <input type="text" id="photoName" />
@@ -33,8 +26,6 @@
     const descInput = document.getElementById('photoDescription');
     const btnSave = document.getElementById('btnSave');
     const btnBack = document.getElementById('btnBack');
-    const btnAI = document.getElementById('btnAI');
-    const aiSuggestions = document.getElementById('aiSuggestions');
 
     const photoData = sessionStorage.getItem('currentPhoto');
     if (photoData) {
@@ -44,51 +35,6 @@
       alert('画像情報がありません。再度写真を選択してください。');
       location.href = 'add_photo.html';
     }
-
-    // AIモデルをロード
-    let model;
-    async function loadModel() {
-        console.log("AIモデルを読み込み中...");
-        model = await mobilenet.load();
-        console.log("AIモデルの読み込みが完了しました。");
-        btnAI.disabled = false;
-        btnAI.textContent = "AIで自動入力";
-        btnAI.style.backgroundColor = 'lightgreen';
-    }
-
-    // 画像から予測
-    async function predictImage() {
-        const predictions = await model.classify(image);
-        return predictions;
-    }
-    
-    // 予測結果をボタンで表示
-    function displaySuggestions(predictions) {
-        aiSuggestions.innerHTML = '';
-        predictions.forEach(p => {
-            const button = document.createElement('button');
-            button.textContent = `${p.className} (${Math.round(p.probability * 100)}%)`;
-            button.onclick = () => {
-                const className = p.className.split(',')[0].trim();
-                nameInput.value = className;
-                descInput.value = `AIによる推定：${className}`;
-            };
-            aiSuggestions.appendChild(button);
-        });
-    }
-
-    btnAI.onclick = async () => {
-        btnAI.textContent = "AIで解析中...";
-        btnAI.disabled = true;
-        aiSuggestions.innerHTML = '';
-        const predictions = await predictImage();
-        displaySuggestions(predictions);
-        btnAI.textContent = "AIで自動入力";
-        btnAI.disabled = false;
-    };
-
-    // 初期ロード時にAIモデルを読み込む
-    loadModel();
 
     btnSave.onclick = () => {
       const name = nameInput.value.trim();
@@ -109,6 +55,7 @@
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          // 修正点：写真に一意のIDを付与
           const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
