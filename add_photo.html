@@ -16,47 +16,41 @@
 
   <p id="status"></p>
 
-  <button onclick="location.href='/app/zukan_list.html'">図鑑一覧に戻る</button>
+  <button onclick="location.href='zukan_list.html'">図鑑一覧に戻る</button>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const zukanId = localStorage.getItem('currentZukanId');
-      if (!zukanId) {
-        alert("写真を追加する図鑑が選択されていません。図鑑一覧に戻ります。");
-        location.href = '/app/zukan_list.html';
+    document.getElementById('photoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const imageFile = document.getElementById('photoImage').files[0];
+
+      if (!imageFile) {
+        alert("画像を選んでください");
         return;
       }
 
-      document.getElementById('photoForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const imageFile = document.getElementById('photoImage').files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
-        if (!imageFile) {
-          alert("画像を選んでください");
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800;
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-            sessionStorage.setItem('currentPhoto', resizedDataUrl);
-            location.href = '/app/photo_info.html';
-          };
-          img.src = event.target.result;
+          // 画像データをセッションストレージに保存
+          sessionStorage.setItem('currentPhoto', resizedDataUrl);
+          
+          // 新しいページへ遷移
+          location.href = 'check_photo.html';
         };
-        reader.readAsDataURL(imageFile);
-      });
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(imageFile);
     });
   </script>
 </body>
