@@ -1,5 +1,3 @@
-// 共通関数
-
 // localStorageから図鑑データを取得
 function getZukans() {
   const json = localStorage.getItem('zukans');
@@ -34,10 +32,25 @@ function deleteZukan(id) {
 // 特定の図鑑をIDで取得
 function getZukanById(id) {
   const zukans = getZukans();
-  return zukans.find(zukan => zukan.id === id);
+  return zukans.find(zukan => z.id === id);
 }
 
-// 特定の図鑑から写真をIDで削除する関数
+// 特定の図鑑に写真を追加
+function addPhotoToZukan(zukanId, photo) {
+  const zukans = getZukans();
+  const zukanIndex = zukans.findIndex(zukan => zukan.id === zukanId);
+  if (zukanIndex !== -1) {
+    if (!zukans[zukanIndex].photos) {
+      zukans[zukanIndex].photos = [];
+    }
+    zukans[zukanIndex].photos.push(photo);
+    saveZukans(zukans);
+  } else {
+    console.error('指定された図鑑が見つかりません');
+  }
+}
+
+// 特定の図鑑から写真をIDで削除
 function deletePhotoFromZukan(zukanId, photoId) {
   const zukans = getZukans();
   const zukan = zukans.find(z => z.id === zukanId);
