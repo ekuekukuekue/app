@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <title>図鑑を見る</title>
   <link rel="stylesheet" href="style.css" />
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -34,26 +31,10 @@
           card.innerHTML = `
             <h3>${photo.name}</h3>
             <p>${photo.description || ''}</p>
-            <p>性別: ${photo.sex || '不明'}</p>
             <img src="${photo.image}" alt="${photo.name}" width="200">
-            <div id="map-${index}" style="height:200px; margin-top:10px;"></div>
             <button onclick="deletePhoto('${zukanId}', '${photo.id}')">この写真を削除</button>
           `;
           photoList.appendChild(card);
-
-          if (photo.lat && photo.lng && photo.showGps) {
-            const map = L.map(`map-${index}`).setView([photo.lat, photo.lng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            L.marker([photo.lat, photo.lng]).addTo(map)
-              .bindPopup(photo.name || "撮影場所")
-              .openPopup();
-          } else {
-            document.getElementById(`map-${index}`).innerHTML =
-              "<p style='color:gray;'>位置情報なし</p>";
-          }
         });
       }
     });
