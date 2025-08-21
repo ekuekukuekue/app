@@ -39,7 +39,7 @@
         zukans.forEach(zukan => {
           if (zukan.photos) {
             zukan.photos.forEach(photo => {
-              if (photo.lat && photo.lng) {
+              if (photo.lat && photo.lng && photo.showGps) { // GPS情報があり、表示が有効な場合のみマーカーを表示
                 const marker = L.marker([photo.lat, photo.lng]);
                 marker.bindPopup(`
                   <b>${photo.name}</b><br>
