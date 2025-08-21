@@ -12,39 +12,18 @@
 <body>
   <header><h1>図鑑の中身</h1></header>
   <div id="photoList" class="photo-list"></div>
-  <button id="btnBack">図鑑一覧に戻る</button>
-  <button id="btnHome" style="display:none;">スタート画面に戻る</button>
+  <button onclick="location.href='zukan_list.html'">図鑑一覧に戻る</button>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const photoList = document.getElementById('photoList');
-      const btnBack = document.getElementById('btnBack');
-      const btnHome = document.getElementById('btnHome');
-
-      // URLから図鑑IDを取得
-      const params = new URLSearchParams(location.search);
-      const sharedZukanId = params.get('id');
-
-      let zukanId;
-      if (sharedZukanId) {
-          zukanId = sharedZukanId;
-          // 共有されたページでは「戻る」ボタンを非表示にし、「スタートに戻る」を表示
-          btnBack.style.display = 'none';
-          btnHome.style.display = 'inline';
-      } else {
-          zukanId = localStorage.getItem('currentZukanId');
-          // 通常の閲覧ページでは「スタートに戻る」を非表示
-          btnHome.style.display = 'none';
-      }
-
+      const zukanId = localStorage.getItem('currentZukanId');
       const zukan = getZukanById(zukanId);
+      const photoList = document.getElementById('photoList');
 
       if (!zukan) {
         photoList.innerHTML = '<p>図鑑が見つかりません。</p>';
         return;
       }
-
-      document.querySelector('header h1').textContent = `${zukan.name}`;
 
       if (!zukan.photos || zukan.photos.length === 0) {
         photoList.innerHTML = '<p>写真がまだ登録されていません。</p>';
@@ -55,8 +34,9 @@
           card.innerHTML = `
             <h3>${photo.name}</h3>
             <p>${photo.description || ''}</p>
-            <img src="${photo.image}" alt="${photo.name}" width="200" id="photo-${index}">
+            <img src="${photo.image}" alt="${photo.name}" width="200">
             <div id="map-${index}" style="height:200px; margin-top:10px;"></div>
+            <button onclick="deletePhoto('${zukanId}', '${photo.id}')">この写真を削除</button>
           `;
           photoList.appendChild(card);
 
@@ -75,15 +55,15 @@
           }
         });
       }
-      
-      btnBack.onclick = () => {
-          location.href = 'zukan_list.html';
-      };
-      
-      btnHome.onclick = () => {
-          location.href = 'index.html';
-      };
     });
+
+    // 写真の削除関数を新しく追加
+    function deletePhoto(zukanId, photoId) {
+      if (confirm("この写真を削除しますか？")) {
+        deletePhotoFromZukan(zukanId, photoId);
+        location.reload(); // ページを再読み込みして更新
+      }
+    }
   </script>
 </body>
 </html>
