@@ -22,6 +22,11 @@
     <label for="photoDescription">説明：</label>
     <textarea id="photoDescription"></textarea>
   </div>
+  
+  <div class="input-section">
+    <label for="showGps">GPS情報を表示する：</label>
+    <input type="checkbox" id="showGps" checked>
+  </div>
 
   <div class="button-section">
     <button id="btnSave">登録</button>
@@ -47,6 +52,7 @@
     btnSave.onclick = () => {
       const name = nameInput.value.trim();
       const desc = descInput.value.trim();
+      const showGps = document.getElementById('showGps').checked;
 
       if (!photoData || !name || !desc) {
         alert('名前と説明を入力してください');
@@ -63,20 +69,20 @@
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng, showGps: showGps };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
           location.href = 'complete.html';
         }, (err) => {
           alert("位置情報を取得できませんでした");
-          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null, showGps: showGps };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
           location.href = 'complete.html';
         });
       } else {
         alert("この端末では位置情報が使えません");
-        const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
+        const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null, showGps: showGps };
         addPhotoToZukan(zukanId, photo);
         sessionStorage.removeItem('currentPhoto');
         location.href = 'complete.html';
@@ -103,3 +109,4 @@
   </script>
 </body>
 </html>
+ 
