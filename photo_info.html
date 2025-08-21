@@ -23,19 +23,6 @@
     <textarea id="photoDescription"></textarea>
   </div>
 
-  <div class="input-section">
-    <label>性別：</label>
-    <input type="radio" id="male" name="sex" value="オス" checked>
-    <label for="male">オス</label>
-    <input type="radio" id="female" name="sex" value="メス">
-    <label for="female">メス</label>
-  </div>
-  
-  <div class="input-section">
-    <label for="showGps">GPS情報を表示する：</label>
-    <input type="checkbox" id="showGps" checked>
-  </div>
-
   <div class="button-section">
     <button id="btnSave">登録</button>
     <button id="btnBack">戻る</button>
@@ -60,8 +47,6 @@
     btnSave.onclick = () => {
       const name = nameInput.value.trim();
       const desc = descInput.value.trim();
-      const sex = document.querySelector('input[name="sex"]:checked').value;
-      const showGps = document.getElementById('showGps').checked;
 
       if (!photoData || !name || !desc) {
         alert('名前と説明を入力してください');
@@ -78,20 +63,20 @@
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng, sex: sex, showGps: showGps };
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: lat, lng: lng };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
           location.href = 'complete.html';
         }, (err) => {
           alert("位置情報を取得できませんでした");
-          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null, sex: sex, showGps: showGps };
+          const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
           addPhotoToZukan(zukanId, photo);
           sessionStorage.removeItem('currentPhoto');
           location.href = 'complete.html';
         });
       } else {
         alert("この端末では位置情報が使えません");
-        const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null, sex: sex, showGps: showGps };
+        const photo = { id: Date.now().toString(), image: photoData, name: name, description: desc, lat: null, lng: null };
         addPhotoToZukan(zukanId, photo);
         sessionStorage.removeItem('currentPhoto');
         location.href = 'complete.html';
