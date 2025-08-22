@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>みんなの図鑑</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>みんなの図鑑</h1>
+  </header>
+  <div id="sharedListContainer"></div>
+  <button onclick="location.href='index.html'">スタート画面に戻る</button>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const sharedListContainer = document.getElementById('sharedListContainer');
+      const zukans = getZukans();
+      const sharedZukans = zukans.filter(zukan => zukan.shared);
+
+      if (sharedZukans.length === 0) {
+        sharedListContainer.innerHTML = '<p>まだ共有された図鑑はありません。</p>';
+        return;
+      }
+
+      sharedZukans.forEach(zukan => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <span>${zukan.name}</span>
+          <button onclick="localStorage.setItem('currentZukanId', '${zukan.id}'); location.href = 'zukan_view.html';">見る</button>
+        `;
+        sharedListContainer.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
