@@ -15,7 +15,7 @@
   <button onclick="history.back()">前のページに戻る</button>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const zukanId = localStorage.getItem('currentZukanId');
       const zukan = getZukanById(zukanId);
       const photoList = document.getElementById('photoList');
